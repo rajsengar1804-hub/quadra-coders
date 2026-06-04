@@ -3,7 +3,7 @@ werkzeug
 pymupdf
 PyPDF2
 easyocr
-opencv-python
+opencv-python-headless
 pillow
 numpy
 scikit-image

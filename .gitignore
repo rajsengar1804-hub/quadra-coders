@@ -1,0 +1,10 @@
+venv/
+__pycache__/
+*.pyc
+.env
+static/uploads/*
+static/processed/*
+static/result_images/*
+!static/uploads/.gitkeep
+!static/processed/.gitkeep
+!static/result_images/.gitkeep
