@@ -2,320 +2,563 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>FakeDoc Detector</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
     :root {
-      --bg:        #0f1117;
-      --surface:   #181c27;
-      --border:    #272c3d;
-      --accent:    #3b82f6;
-      --accent-h:  #60a5fa;
-      --danger:    #ef4444;
-      --text:      #e8eaf0;
-      --muted:     #6b7280;
-      --green:     #22c55e;
+      --bg: #0b1020;
+      --surface: rgba(255, 255, 255, 0.07);
+      --surface-2: rgba(255, 255, 255, 0.1);
+      --border: rgba(255, 255, 255, 0.14);
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --blue: #3b82f6;
+      --green: #22c55e;
+      --yellow: #f59e0b;
+      --red: #ef4444;
+      --purple: #a855f7;
     }
 
     body {
       min-height: 100vh;
-      background: var(--bg);
-      font-family: 'DM Sans', sans-serif;
+      font-family: "Segoe UI", system-ui, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(59,130,246,0.35), transparent 32%),
+        radial-gradient(circle at top right, rgba(168,85,247,0.25), transparent 32%),
+        radial-gradient(circle at bottom, rgba(34,197,94,0.18), transparent 32%),
+        var(--bg);
+      padding: 30px 18px;
+    }
+
+    .container {
+      max-width: 1120px;
+      margin: 0 auto;
+    }
+
+    .navbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 52px;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, var(--blue), var(--purple));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.35rem;
+      box-shadow: 0 12px 30px rgba(59,130,246,0.25);
+    }
+
+    .brand-text h2 {
+      font-size: 1.15rem;
+      letter-spacing: 0.03em;
+    }
+
+    .brand-text p {
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .nav-badge {
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: rgba(34,197,94,0.1);
+      border: 1px solid rgba(34,197,94,0.25);
+      color: #86efac;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+
+    .hero {
+      text-align: center;
+      margin-bottom: 36px;
+    }
+
+    .hero-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      border-radius: 999px;
+      background: rgba(59,130,246,0.1);
+      border: 1px solid rgba(59,130,246,0.28);
+      color: #bfdbfe;
+      font-size: 0.85rem;
+      margin-bottom: 18px;
+    }
+
+    .hero h1 {
+      font-size: clamp(2.2rem, 6vw, 4.6rem);
+      line-height: 1.05;
+      margin-bottom: 16px;
+      letter-spacing: -0.06em;
+    }
+
+    .gradient-text {
+      background: linear-gradient(90deg, #60a5fa, #a78bfa, #34d399);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero p {
+      max-width: 760px;
+      margin: 0 auto;
+      color: var(--muted);
+      line-height: 1.7;
+      font-size: 1rem;
+    }
+
+    .section-title {
+      text-align: center;
+      margin: 40px 0 22px;
+    }
+
+    .section-title h2 {
+      font-size: 1.25rem;
+      margin-bottom: 8px;
+    }
+
+    .section-title p {
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+      margin-bottom: 28px;
+    }
+
+    @media (max-width: 900px) {
+      .cards {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .cert-card {
+      position: relative;
+      overflow: hidden;
+      border-radius: 22px;
+      padding: 26px;
+      min-height: 245px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      backdrop-filter: blur(16px);
+      box-shadow: 0 24px 70px rgba(0,0,0,0.25);
+      transition: transform 0.25s ease, border-color 0.25s ease, background 0.25s ease;
+      text-decoration: none;
       color: var(--text);
       display: flex;
       flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .cert-card:hover {
+      transform: translateY(-8px);
+      background: var(--surface-2);
+      border-color: rgba(255,255,255,0.28);
+    }
+
+    .cert-card::before {
+      content: "";
+      position: absolute;
+      inset: -1px;
+      background: radial-gradient(circle at top right, rgba(255,255,255,0.14), transparent 38%);
+      pointer-events: none;
+    }
+
+    .card-icon {
+      width: 58px;
+      height: 58px;
+      border-radius: 18px;
+      display: flex;
       align-items: center;
       justify-content: center;
-      padding: 2rem 1rem;
-      background-image:
-        radial-gradient(ellipse 60% 50% at 70% 10%, rgba(59,130,246,0.08) 0%, transparent 70%),
-        radial-gradient(ellipse 40% 30% at 10% 80%, rgba(99,102,241,0.06) 0%, transparent 60%);
+      font-size: 1.8rem;
+      margin-bottom: 18px;
     }
 
-    .badge {
+    .income .card-icon {
+      background: rgba(34,197,94,0.15);
+      border: 1px solid rgba(34,197,94,0.25);
+    }
+
+    .caste .card-icon {
+      background: rgba(245,158,11,0.15);
+      border: 1px solid rgba(245,158,11,0.25);
+    }
+
+    .degree .card-icon {
+      background: rgba(168,85,247,0.15);
+      border: 1px solid rgba(168,85,247,0.25);
+    }
+
+    .cert-card h3 {
+      font-size: 1.25rem;
+      margin-bottom: 10px;
+    }
+
+    .cert-card p {
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.55;
+      margin-bottom: 18px;
+    }
+
+    .card-cta {
       display: inline-flex;
       align-items: center;
-      gap: 6px;
-      background: rgba(59,130,246,0.12);
-      border: 1px solid rgba(59,130,246,0.25);
-      color: var(--accent-h);
-      font-size: 0.72rem;
-      font-weight: 500;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      padding: 4px 12px;
-      border-radius: 999px;
-      margin-bottom: 1.4rem;
-    }
-    .badge::before {
-      content: '';
-      width: 6px; height: 6px;
-      background: var(--green);
-      border-radius: 50%;
-      box-shadow: 0 0 8px var(--green);
-      animation: pulse 2s infinite;
-    }
-    @keyframes pulse {
-      0%,100% { opacity:1; } 50% { opacity:0.4; }
+      gap: 8px;
+      color: #bfdbfe;
+      font-size: 0.88rem;
+      font-weight: 700;
     }
 
-    .card {
+    .features {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin-top: 26px;
+    }
+
+    @media (max-width: 900px) {
+      .features {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 520px) {
+      .features {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .feature {
+      background: rgba(255,255,255,0.045);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 18px;
+    }
+
+    .feature strong {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 0.92rem;
+    }
+
+    .feature span {
+      color: var(--muted);
+      font-size: 0.82rem;
+      line-height: 1.5;
+    }
+
+    .upload-shell {
+      max-width: 760px;
+      margin: 0 auto;
+    }
+
+    .upload-card {
+      border-radius: 26px;
+      padding: 30px;
       background: var(--surface);
       border: 1px solid var(--border);
+      backdrop-filter: blur(16px);
+      box-shadow: 0 24px 70px rgba(0,0,0,0.25);
+    }
+
+    .upload-header {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      margin-bottom: 22px;
+    }
+
+    .upload-header .big-icon {
+      width: 64px;
+      height: 64px;
       border-radius: 20px;
-      padding: 2.8rem 2.5rem;
-      width: 100%;
-      max-width: 520px;
-      box-shadow: 0 24px 60px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.03);
-      animation: slideUp 0.5s cubic-bezier(.22,1,.36,1) both;
-    }
-    @keyframes slideUp {
-      from { opacity:0; transform: translateY(24px); }
-      to   { opacity:1; transform: translateY(0); }
+      background: linear-gradient(135deg, var(--blue), var(--purple));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      flex-shrink: 0;
     }
 
-    .header { text-align: center; margin-bottom: 2rem; }
-
-    .icon-wrap {
-      width: 64px; height: 64px;
-      background: linear-gradient(135deg, rgba(59,130,246,0.15), rgba(99,102,241,0.1));
-      border: 1px solid rgba(59,130,246,0.2);
-      border-radius: 16px;
-      display: flex; align-items: center; justify-content: center;
-      margin: 0 auto 1.2rem;
-      font-size: 1.8rem;
+    .upload-header h1 {
+      font-size: 1.65rem;
+      margin-bottom: 6px;
     }
 
-    h1 {
-      font-family: 'Syne', sans-serif;
-      font-size: 1.8rem;
-      font-weight: 800;
-      letter-spacing: -0.02em;
-      background: linear-gradient(135deg, #e8eaf0 30%, #93a6c8);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      line-height: 1.15;
-      margin-bottom: 0.45rem;
-    }
-
-    .subtitle {
-      font-size: 0.82rem;
+    .upload-header p {
       color: var(--muted);
-      font-weight: 400;
-      letter-spacing: 0.01em;
+      font-size: 0.9rem;
+      line-height: 1.5;
     }
 
-    .divider {
-      height: 1px;
-      background: var(--border);
-      margin: 1.6rem 0;
-    }
-
-    .desc {
-      font-size: 0.88rem;
-      color: var(--muted);
-      line-height: 1.65;
-      margin-bottom: 1.6rem;
+    .error-box {
+      background: rgba(239,68,68,0.1);
+      border: 1px solid rgba(239,68,68,0.28);
+      color: #fca5a5;
+      padding: 12px 14px;
+      border-radius: 12px;
+      margin-bottom: 18px;
+      font-size: 0.9rem;
     }
 
     .drop-zone {
-      border: 2px dashed var(--border);
-      border-radius: 14px;
-      padding: 2.2rem 1.5rem;
+      border: 2px dashed rgba(148,163,184,0.35);
+      border-radius: 20px;
+      padding: 34px 24px;
       text-align: center;
-      cursor: pointer;
-      transition: border-color 0.2s, background 0.2s;
-      margin-bottom: 1.2rem;
-      position: relative;
-      background: rgba(255,255,255,0.01);
-    }
-    .drop-zone:hover,
-    .drop-zone.dragover {
-      border-color: var(--accent);
-      background: rgba(59,130,246,0.04);
+      background: rgba(15,23,42,0.35);
+      margin-bottom: 18px;
     }
 
-    .drop-icon { font-size: 2rem; margin-bottom: 0.6rem; }
+    .drop-zone .upload-icon {
+      font-size: 2.4rem;
+      margin-bottom: 12px;
+    }
 
-    .drop-label {
-      font-size: 0.88rem;
+    .drop-zone h3 {
+      margin-bottom: 8px;
+      font-size: 1.08rem;
+    }
+
+    .drop-zone p {
       color: var(--muted);
-      line-height: 1.6;
-    }
-    .drop-label strong { color: var(--accent-h); }
-
-    .file-tags {
-      display: flex;
-      justify-content: center;
-      gap: 6px;
-      margin-top: 0.8rem;
-      flex-wrap: wrap;
-    }
-    .file-tag {
-      font-size: 0.7rem;
-      font-weight: 500;
-      letter-spacing: 0.06em;
-      padding: 3px 10px;
-      border-radius: 999px;
-      border: 1px solid var(--border);
-      color: var(--muted);
+      font-size: 0.86rem;
+      margin-bottom: 18px;
     }
 
-    /* ✅ Hidden real file input — id used by JS, name used by Flask */
-    #fileInput { display: none; }
-
-    .file-chosen {
-      font-size: 0.82rem;
-      color: var(--green);
-      margin-top: 0.7rem;
-      min-height: 1.2rem;
-      font-weight: 500;
-    }
-
-    .btn-upload {
+    input[type="file"] {
       width: 100%;
-      padding: 0.85rem;
-      background: var(--accent);
-      color: #fff;
-      font-family: 'DM Sans', sans-serif;
-      font-size: 0.95rem;
-      font-weight: 500;
-      border: none;
-      border-radius: 12px;
-      cursor: pointer;
-      transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
-      box-shadow: 0 4px 20px rgba(59,130,246,0.3);
-      letter-spacing: 0.01em;
-    }
-    .btn-upload:hover {
-      background: var(--accent-h);
-      box-shadow: 0 6px 28px rgba(59,130,246,0.45);
-      transform: translateY(-1px);
-    }
-    .btn-upload:active { transform: translateY(0); }
-
-    .alert {
-      background: rgba(239,68,68,0.08);
-      border: 1px solid rgba(239,68,68,0.25);
-      color: #fca5a5;
-      border-radius: 10px;
-      padding: 0.75rem 1rem;
-      font-size: 0.85rem;
-      margin-bottom: 1.2rem;
-      display: flex;
-      align-items: flex-start;
-      gap: 8px;
-      line-height: 1.5;
-    }
-    .alert-icon { flex-shrink: 0; font-size: 1rem; }
-
-    .footer {
-      text-align: center;
-      font-size: 0.75rem;
+      max-width: 420px;
       color: var(--muted);
-      margin-top: 2rem;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px;
+      cursor: pointer;
     }
 
-    @media (max-width: 540px) {
-      .card { padding: 2rem 1.5rem; }
-      h1 { font-size: 1.5rem; }
+    .analyze-btn {
+      width: 100%;
+      border: none;
+      border-radius: 16px;
+      padding: 15px 22px;
+      background: linear-gradient(135deg, var(--blue), var(--purple));
+      color: white;
+      font-size: 1rem;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 18px 45px rgba(59,130,246,0.25);
+      transition: transform 0.2s ease, opacity 0.2s ease;
+      margin-top: 10px;
+    }
+
+    .analyze-btn:hover {
+      transform: translateY(-2px);
+      opacity: 0.92;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 18px;
+      color: #bfdbfe;
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+
+    .footer-note {
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.8rem;
+      margin-top: 34px;
+      line-height: 1.6;
     }
   </style>
 </head>
+
 <body>
+  <div class="container">
 
-  <div class="badge">AI Verification System · Active</div>
-
-  <div class="card">
-    <div class="header">
-      <div class="icon-wrap">🛡️</div>
-      <h1>FakeDoc Detector</h1>
-      <p class="subtitle">AI-Based Income Certificate Verification System</p>
-    </div>
-
-    <div class="divider"></div>
-
-    <p class="desc">
-      Upload an income certificate in <strong>PDF, PNG, JPG, or JPEG</strong> format.
-      The system will verify its authenticity using OCR, template matching, and AI analysis.
-    </p>
-
-    {% if error %}
-    <div class="alert">
-      <span class="alert-icon">⚠️</span>
-      <span>{{ error }}</span>
-    </div>
-    {% endif %}
-
-    <!-- ✅ enctype required for file upload | action matches Flask route -->
-    <form action="/upload" method="POST" enctype="multipart/form-data" id="uploadForm">
-
-      <div class="drop-zone" id="dropZone">
-        <div class="drop-icon">📄</div>
-        <div class="drop-label">
-          <strong>Click to browse</strong> or drag &amp; drop your file here
+    <nav class="navbar">
+      <div class="brand">
+        <div class="brand-icon">🛡️</div>
+        <div class="brand-text">
+          <h2>FakeDoc Detector</h2>
+          <p>AI-powered document verification</p>
         </div>
-        <div class="file-tags">
-          <span class="file-tag">PDF</span>
-          <span class="file-tag">PNG</span>
-          <span class="file-tag">JPG</span>
-          <span class="file-tag">JPEG</span>
-        </div>
-
-        <!-- ✅ name="file" must match request.files['file'] in app.py -->
-        <input type="file" id="fileInput" name="file" accept=".pdf,.png,.jpg,.jpeg" />
       </div>
 
-      <div class="file-chosen" id="fileChosen"></div>
+      <div class="nav-badge">Hackathon Demo System</div>
+    </nav>
 
-      <button type="submit" class="btn-upload">⬆ Upload &amp; Analyze</button>
-    </form>
+    {% if not selected_type %}
+
+      <section class="hero">
+        <div class="hero-pill">✨ OCR · Metadata · Template Matching · Risk Score</div>
+
+        <h1>
+          Verify Documents with
+          <span class="gradient-text">Explainable AI</span>
+        </h1>
+
+        <p>
+          Select the document type you want to verify. Our system checks OCR text,
+          extracted fields, reference data, metadata, template similarity, and generates
+          a clear authenticity report.
+        </p>
+      </section>
+
+      <div class="section-title">
+        <h2>Choose Certificate Type</h2>
+        <p>Select one option to start verification</p>
+      </div>
+
+      <section class="cards">
+        <a href="/check/income" class="cert-card income">
+          <div>
+            <div class="card-icon">💰</div>
+            <h3>Income Certificate</h3>
+            <p>
+              Verify annual income, applicant details, certificate number,
+              authority, seal, date, and template layout.
+            </p>
+          </div>
+          <span class="card-cta">Check Income Certificate →</span>
+        </a>
+
+        <a href="/check/caste" class="cert-card caste">
+          <div>
+            <div class="card-icon">🏛️</div>
+            <h3>Caste Certificate</h3>
+            <p>
+              Verify caste certificate template, extracted text, metadata,
+              reference records, and suspicious document signs.
+            </p>
+          </div>
+          <span class="card-cta">Check Caste Certificate →</span>
+        </a>
+
+        <a href="/check/degree" class="cert-card degree">
+          <div>
+            <div class="card-icon">🎓</div>
+            <h3>Degree Certificate</h3>
+            <p>
+              Verify academic document layout, certificate fields, hidden metadata,
+              and authenticity score.
+            </p>
+          </div>
+          <span class="card-cta">Check Degree Certificate →</span>
+        </a>
+      </section>
+
+      <section class="features">
+        <div class="feature">
+          <strong>🔍 OCR Extraction</strong>
+          <span>Reads visible text from uploaded certificate images and PDFs.</span>
+        </div>
+
+        <div class="feature">
+          <strong>📋 Template Match</strong>
+          <span>Compares uploaded layout with the saved genuine template.</span>
+        </div>
+
+        <div class="feature">
+          <strong>🔗 Reference Check</strong>
+          <span>Matches extracted fields with stored original certificate data.</span>
+        </div>
+
+        <div class="feature">
+          <strong>📊 Risk Report</strong>
+          <span>Generates score, fraud type, issues, and recommendation.</span>
+        </div>
+      </section>
+
+    {% else %}
+
+      <section class="upload-shell">
+        <div class="upload-card">
+
+          <div class="upload-header">
+            <div class="big-icon">
+              {% if selected_type == "income" %}
+                💰
+              {% elif selected_type == "caste" %}
+                🏛️
+              {% else %}
+                🎓
+              {% endif %}
+            </div>
+
+            <div>
+              <h1>Upload {{ certificate_name }}</h1>
+              <p>
+                Upload a PDF, PNG, JPG, or JPEG file. The system will verify it using
+                the saved {{ certificate_name }} template and reference data.
+              </p>
+            </div>
+          </div>
+
+          {% if error %}
+            <div class="error-box">⚠️ {{ error }}</div>
+          {% endif %}
+
+          <form action="/upload" method="POST" enctype="multipart/form-data">
+            <input type="hidden" name="certificate_type" value="{{ selected_type }}">
+
+            <div class="drop-zone">
+              <div class="upload-icon">📤</div>
+              <h3>Select document file</h3>
+              <p>Supported formats: PDF, PNG, JPG, JPEG</p>
+
+              <input type="file" name="file" accept=".pdf,.png,.jpg,.jpeg" required>
+            </div>
+
+            <button type="submit" class="analyze-btn">
+              Analyze {{ certificate_name }}
+            </button>
+          </form>
+
+          <a href="/" class="back-link">← Choose another certificate type</a>
+
+        </div>
+      </section>
+
+    {% endif %}
+
+    <p class="footer-note">
+      Demo project for hackathon use only. No real government certificate or personal data is required.
+    </p>
+
   </div>
-
-  <div class="footer">FakeDoc Detector · Hackathon Build · Module 4 of 7</div>
-
-  <script>
-    const dropZone   = document.getElementById('dropZone');
-    const fileInput  = document.getElementById('fileInput');
-    const fileChosen = document.getElementById('fileChosen');
-
-    // Click anywhere on drop zone to open file picker
-    dropZone.addEventListener('click', () => fileInput.click());
-
-    // Show selected filename below the drop zone
-    fileInput.addEventListener('change', () => {
-      fileChosen.textContent = fileInput.files.length > 0
-        ? '✓ ' + fileInput.files[0].name
-        : '';
-    });
-
-    // Drag over — highlight the zone
-    dropZone.addEventListener('dragover', (e) => {
-      e.preventDefault();
-      dropZone.classList.add('dragover');
-    });
-
-    // Drag leave — remove highlight
-    dropZone.addEventListener('dragleave', () => {
-      dropZone.classList.remove('dragover');
-    });
-
-    // Drop — assign file to input and show name
-    dropZone.addEventListener('drop', (e) => {
-      e.preventDefault();
-      dropZone.classList.remove('dragover');
-      const dt = e.dataTransfer;
-      if (dt.files.length > 0) {
-        fileInput.files = dt.files;
-        fileChosen.textContent = '✓ ' + dt.files[0].name;
-      }
-    });
-  </script>
-
 </body>
 </html>
