@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FakeDoc Detector</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #0f1117;
+      --surface:   #181c27;
+      --border:    #272c3d;
+      --accent:    #3b82f6;
+      --accent-h:  #60a5fa;
+      --danger:    #ef4444;
+      --text:      #e8eaf0;
+      --muted:     #6b7280;
+      --green:     #22c55e;
+    }
+
+    body {
+      min-height: 100vh;
+      background: var(--bg);
+      font-family: 'DM Sans', sans-serif;
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1rem;
+      background-image:
+        radial-gradient(ellipse 60% 50% at 70% 10%, rgba(59,130,246,0.08) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 30% at 10% 80%, rgba(99,102,241,0.06) 0%, transparent 60%);
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(59,130,246,0.12);
+      border: 1px solid rgba(59,130,246,0.25);
+      color: var(--accent-h);
+      font-size: 0.72rem;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 4px 12px;
+      border-radius: 999px;
+      margin-bottom: 1.4rem;
+    }
+    .badge::before {
+      content: '';
+      width: 6px; height: 6px;
+      background: var(--green);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--green);
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%,100% { opacity:1; } 50% { opacity:0.4; }
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 2.8rem 2.5rem;
+      width: 100%;
+      max-width: 520px;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.03);
+      animation: slideUp 0.5s cubic-bezier(.22,1,.36,1) both;
+    }
+    @keyframes slideUp {
+      from { opacity:0; transform: translateY(24px); }
+      to   { opacity:1; transform: translateY(0); }
+    }
+
+    .header { text-align: center; margin-bottom: 2rem; }
+
+    .icon-wrap {
+      width: 64px; height: 64px;
+      background: linear-gradient(135deg, rgba(59,130,246,0.15), rgba(99,102,241,0.1));
+      border: 1px solid rgba(59,130,246,0.2);
+      border-radius: 16px;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 1.2rem;
+      font-size: 1.8rem;
+    }
+
+    h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.8rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      background: linear-gradient(135deg, #e8eaf0 30%, #93a6c8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1.15;
+      margin-bottom: 0.45rem;
+    }
+
+    .subtitle {
+      font-size: 0.82rem;
+      color: var(--muted);
+      font-weight: 400;
+      letter-spacing: 0.01em;
+    }
+
+    .divider {
+      height: 1px;
+      background: var(--border);
+      margin: 1.6rem 0;
+    }
+
+    .desc {
+      font-size: 0.88rem;
+      color: var(--muted);
+      line-height: 1.65;
+      margin-bottom: 1.6rem;
+    }
+
+    .drop-zone {
+      border: 2px dashed var(--border);
+      border-radius: 14px;
+      padding: 2.2rem 1.5rem;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+      margin-bottom: 1.2rem;
+      position: relative;
+      background: rgba(255,255,255,0.01);
+    }
+    .drop-zone:hover,
+    .drop-zone.dragover {
+      border-color: var(--accent);
+      background: rgba(59,130,246,0.04);
+    }
+
+    .drop-icon { font-size: 2rem; margin-bottom: 0.6rem; }
+
+    .drop-label {
+      font-size: 0.88rem;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+    .drop-label strong { color: var(--accent-h); }
+
+    .file-tags {
+      display: flex;
+      justify-content: center;
+      gap: 6px;
+      margin-top: 0.8rem;
+      flex-wrap: wrap;
+    }
+    .file-tag {
+      font-size: 0.7rem;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      padding: 3px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      color: var(--muted);
+    }
+
+    /* ✅ Hidden real file input — id used by JS, name used by Flask */
+    #fileInput { display: none; }
+
+    .file-chosen {
+      font-size: 0.82rem;
+      color: var(--green);
+      margin-top: 0.7rem;
+      min-height: 1.2rem;
+      font-weight: 500;
+    }
+
+    .btn-upload {
+      width: 100%;
+      padding: 0.85rem;
+      background: var(--accent);
+      color: #fff;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 500;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
+      box-shadow: 0 4px 20px rgba(59,130,246,0.3);
+      letter-spacing: 0.01em;
+    }
+    .btn-upload:hover {
+      background: var(--accent-h);
+      box-shadow: 0 6px 28px rgba(59,130,246,0.45);
+      transform: translateY(-1px);
+    }
+    .btn-upload:active { transform: translateY(0); }
+
+    .alert {
+      background: rgba(239,68,68,0.08);
+      border: 1px solid rgba(239,68,68,0.25);
+      color: #fca5a5;
+      border-radius: 10px;
+      padding: 0.75rem 1rem;
+      font-size: 0.85rem;
+      margin-bottom: 1.2rem;
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      line-height: 1.5;
+    }
+    .alert-icon { flex-shrink: 0; font-size: 1rem; }
+
+    .footer {
+      text-align: center;
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-top: 2rem;
+    }
+
+    @media (max-width: 540px) {
+      .card { padding: 2rem 1.5rem; }
+      h1 { font-size: 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="badge">AI Verification System · Active</div>
+
+  <div class="card">
+    <div class="header">
+      <div class="icon-wrap">🛡️</div>
+      <h1>FakeDoc Detector</h1>
+      <p class="subtitle">AI-Based Income Certificate Verification System</p>
+    </div>
+
+    <div class="divider"></div>
+
+    <p class="desc">
+      Upload an income certificate in <strong>PDF, PNG, JPG, or JPEG</strong> format.
+      The system will verify its authenticity using OCR, template matching, and AI analysis.
+    </p>
+
+    {% if error %}
+    <div class="alert">
+      <span class="alert-icon">⚠️</span>
+      <span>{{ error }}</span>
+    </div>
+    {% endif %}
+
+    <!-- ✅ enctype required for file upload | action matches Flask route -->
+    <form action="/upload" method="POST" enctype="multipart/form-data" id="uploadForm">
+
+      <div class="drop-zone" id="dropZone">
+        <div class="drop-icon">📄</div>
+        <div class="drop-label">
+          <strong>Click to browse</strong> or drag &amp; drop your file here
+        </div>
+        <div class="file-tags">
+          <span class="file-tag">PDF</span>
+          <span class="file-tag">PNG</span>
+          <span class="file-tag">JPG</span>
+          <span class="file-tag">JPEG</span>
+        </div>
+
+        <!-- ✅ name="file" must match request.files['file'] in app.py -->
+        <input type="file" id="fileInput" name="file" accept=".pdf,.png,.jpg,.jpeg" />
+      </div>
+
+      <div class="file-chosen" id="fileChosen"></div>
+
+      <button type="submit" class="btn-upload">⬆ Upload &amp; Analyze</button>
+    </form>
+  </div>
+
+  <div class="footer">FakeDoc Detector · Hackathon Build · Module 4 of 7</div>
+
+  <script>
+    const dropZone   = document.getElementById('dropZone');
+    const fileInput  = document.getElementById('fileInput');
+    const fileChosen = document.getElementById('fileChosen');
+
+    // Click anywhere on drop zone to open file picker
+    dropZone.addEventListener('click', () => fileInput.click());
+
+    // Show selected filename below the drop zone
+    fileInput.addEventListener('change', () => {
+      fileChosen.textContent = fileInput.files.length > 0
+        ? '✓ ' + fileInput.files[0].name
+        : '';
+    });
+
+    // Drag over — highlight the zone
+    dropZone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropZone.classList.add('dragover');
+    });
+
+    // Drag leave — remove highlight
+    dropZone.addEventListener('dragleave', () => {
+      dropZone.classList.remove('dragover');
+    });
+
+    // Drop — assign file to input and show name
+    dropZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropZone.classList.remove('dragover');
+      const dt = e.dataTransfer;
+      if (dt.files.length > 0) {
+        fileInput.files = dt.files;
+        fileChosen.textContent = '✓ ' + dt.files[0].name;
+      }
+    });
+  </script>
+
+</body>
+</html>
